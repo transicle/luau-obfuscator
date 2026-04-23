@@ -1,5 +1,16 @@
-local a = 1
-local b = 2
-local c = a * b
+local Players = game:GetService("Players")
 
-print(c)
+local localPlayer = Players.LocalPlayer
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local humanoid = character:FindFirstChild("Humanoid")
+
+local desiredSpeed = 64
+local function applyWalkspeed(newCharacter)
+    local humanoid = newCharacter:FindFirstChild("Humanoid")
+
+    humanoid.WalkSpeed = desiredSpeed
+end
+
+humanoid.WalkSpeed = desiredSpeed
+
+localPlayer.CharacterAdded:Connect(applyWalkspeed)

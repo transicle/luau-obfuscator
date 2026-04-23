@@ -1,9 +1,3 @@
-# luau-obfuscator
-Basic Luau obfuscator and learning project for beginners exploring code obfuscation and script rewriting.
-
-## Example
-
-```lua
 local bipwdk = game:GetService("bipwdk")
 
 local cjqxel = bipwdk.LocalPlayer
@@ -20,4 +14,3 @@ end
 elszgn.WalkSpeed = fmtaho
 
 cjqxel.CharacterAdded:Connect(ahovcj)
-```
