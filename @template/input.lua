@@ -4,7 +4,7 @@ local localPlayer = Players.LocalPlayer
 local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
 local humanoid = character:FindFirstChild("Humanoid")
 
-local desiredSpeed = 64
+desiredSpeed = 64
 local function applyWalkspeed(newCharacter)
     local humanoid = newCharacter:FindFirstChild("Humanoid")
 
