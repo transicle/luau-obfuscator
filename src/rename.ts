@@ -1,37 +1,37 @@
+import type { Token } from "./tokenize.ts";
+
 function makeName(len: number): string {
     const chars = 'abcdefghijklmnopqrstuvwxyz';
     let name = '';
     for (let i = 0; i < 6; i++) {
         name += chars[(len + i * 7) % chars.length];
     }
-    return name;
+    return name.toUpperCase();
 }
 
-export function renameVars(
-    source: string
-): string {
-    let i = 0;
+export function renameTokens(tokens: Token[]): Token[] {
     const map = new Map<string, string>();
-    
-    source = source.replace(/function\s+([a-zA-Z_]\w*)/g, (_, name) => {
-        if (!map.has(name)) {
-            map.set(name, makeName(i++));
+    let i = 0;
+
+    const isDecl = (t: Token, prev?: Token) =>
+        prev?.value === "local" || prev?.value === "function";
+
+    let prev: Token | undefined;
+
+    return tokens.map((t) => {
+        if (t.type === "ident") {
+            if (!map.has(t.value) && isDecl(t, prev)) {
+                map.set(t.value, makeName(i++));
+            }
+
+            if (map.has(t.value)) {
+                const renamed = map.get(t.value)!;
+                prev = t;
+                return { ...t, value: renamed };
+            }
         }
-        return `function ${map.get(name)}`;
+
+        prev = t;
+        return t;
     });
-
-    source = source.replace(/local\s+([a-zA-Z_]\w*)/g, (_, name) => {
-        if (!map.has(name)) {
-            map.set(name, name !== 'function' ? makeName(i++) : 'function');
-        }
-        return `local ${map.get(name)}`;
-    });
-
-    // replace variable usage
-    for (const [orig, obf] of map.entries()) {
-        const re = new RegExp(`\\b${orig}\\b`, "g");
-        source = source.replace(re, obf);
-    }
-
-    return source;
 }

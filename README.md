@@ -4,20 +4,5 @@ Basic Luau obfuscator and learning project for beginners exploring code obfuscat
 ## Example
 
 ```lua
-local bipwdk = game:GetService("bipwdk")
-
-local cjqxel = bipwdk.LocalPlayer
-local dkryfm = cjqxel.Character or cjqxel.CharacterAdded:Wait()
-local elszgn = dkryfm:FindFirstChild("Humanoid")
-
-local fmtaho = 64
-local function ahovcj(newCharacter)
-    local elszgn = newCharacter:FindFirstChild("Humanoid")
-
-    elszgn.WalkSpeed = fmtaho
-end
-
-elszgn.WalkSpeed = fmtaho
-
-cjqxel.CharacterAdded:Connect(ahovcj)
+localAHOVCJ=gameGetService("Players")localBIPWDK=AHOVCJ.LocalPlayerlocalCJQXEL=BIPWDK.CharacterorBIPWDK.CharacterAddedWait()localDKRYFM=CJQXELFindFirstChild("Humanoid")desiredSpeed=64localELSZGNFMTAHO(newCharacter)localDKRYFM=newCharacterFindFirstChild("Humanoid")DKRYFM.WalkSpeed=desiredSpeedendDKRYFM.WalkSpeed=desiredSpeedBIPWDK.CharacterAddedConnect(FMTAHO)
 ```

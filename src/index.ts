@@ -1,10 +1,22 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { renameVars } from "./rename.ts";
+import { renameTokens } from "./rename.ts";
+import { detokenize, tokenize } from "./tokenize.ts";
+import type { Token } from "./tokenize.ts";
 
 function obfuscate(source: string): string {
-    source = renameVars(source);
-    return source;
+    console.log("SOURCE SIZE:", source.length);
+
+    let tokens: Token[] = tokenize(source);
+    console.log("TOKENS:", tokens.length);
+
+    tokens = renameTokens(tokens);
+    console.log("TOKENS AFTER RENAME:", tokens.length);
+
+    const out = detokenize(tokens);
+    console.log("OUTPUT SIZE:", out.length);
+
+    return out;
 }
 
 const output = obfuscate(readFileSync(path.join("@template", "input.lua"), "utf-8"));
