@@ -106,7 +106,28 @@ Token(IDENTIFIER, applyWalkspeed)
 Token(SYMBOL, ))
 ```
 
-3. Parsing (Rescursive Descent, Pratt)
+3. Symbol Table Managing (Scopes)
+
+We use symbol tables to efficiently track variables, their data, and their scope assigned to them. With a time complexity of O(n), we can safely handle variable data without loss.
+
+Visual representation on scope tracking:
+
+```
+SymbolTable(scopes=2, unique_names=7)
+
+Scope 1 (root)
+  - Players [local] refs=1
+  - applyWalkspeed [local] refs=1
+  - character [local] refs=1
+  - desiredSpeed [global | upval] refs=2
+  - humanoid [local] refs=1
+  - localPlayer [local] refs=3
+  Scope 2 (depth=1)
+    - humanoid [local] refs=1
+    - newCharacter [local | param] refs=1
+```
+
+4. Parsing (Rescursive Descent, Pratt)
 
 Takes that stream of tokens generated from the source code and constructs an AST (**A**bstract **S**yntax **T**ree) based off Luau's grammar rules to allow for deep analysis without guessing how the output should be designed.
 
