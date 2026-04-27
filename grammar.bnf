@@ -1,0 +1,7 @@
+block      = stmt*
+stmt       = local_decl | assign | if | while | for | func_decl | call | ...
+local_decl = "local" name ("=" expr)?
+assign     = name "=" expr
+expr       = term (("+"|"-") term)*
+term       = factor (("*"|"/") factor)*
+factor     = NUMBER | STRING | name | "(" expr ")"

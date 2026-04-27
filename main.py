@@ -1,4 +1,7 @@
+import pprint
+
 from lexer import tokenize
+from parser import parse
 
 if __name__ == "__main__":
     code = ""
@@ -6,11 +9,10 @@ if __name__ == "__main__":
         code = f.read()
     
     tokens = tokenize(code)
-    for token in tokens:
-        print(token)
+    ast = parse(tokens)
+
+    pprint.pprint(ast)
 
     # Write to output file
-
     with open("@template/output.lua", "w") as f:
-        for token in tokens:
-            f.write(f"{token}\n")
+        f.write(repr(ast))
