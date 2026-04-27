@@ -3,24 +3,26 @@ from tokens import *
 # longest symbols first because greedy matching
 _SYMBOLS_SORTED = sorted(SYMBOLS, key=len, reverse=True)
 
+
 def tokenize(code):
     tokens = []
     i = 0
     n = len(code)
 
+    # greedy hungry little boy
     while i < n:
         if code[i].isspace():
             i += 1
             continue
 
-        if code[i:i+2] == "--" and code[i:i+4] != "--[[":
+        if code[i : i + 2] == "--" and code[i : i + 4] != "--[[":
             while i < n and code[i] != "\n":
                 i += 1
             continue
 
-        if code[i:i+4] == "--[[":
+        if code[i : i + 4] == "--[[":
             i += 4
-            while i < n and code[i:i+2] != "]]":
+            while i < n and code[i : i + 2] != "]]":
                 i += 1
             i += 2
             continue
@@ -58,7 +60,7 @@ def tokenize(code):
             i = j
             continue
 
-        if code[i] == "[" and i + 1 < n and code[i+1] in ("[", "="):
+        if code[i] == "[" and i + 1 < n and code[i + 1] in ("[", "="):
             level = 0
             k = i + 1
             while k < n and code[k] == "=":
@@ -73,15 +75,17 @@ def tokenize(code):
                     i = j
                     continue
 
-        if code[i].isdigit() or (code[i] == "." and i + 1 < n and code[i+1].isdigit()):
+        if code[i].isdigit() or (
+            code[i] == "." and i + 1 < n and code[i + 1].isdigit()
+        ):
             j = i
             # hex  0x...
-            if code[j:j+2] in ("0x", "0X"):
+            if code[j : j + 2] in ("0x", "0X"):
                 j += 2
                 while j < n and (code[j] in "0123456789abcdefABCDEF_"):
                     j += 1
             # binary  0b...
-            elif code[j:j+2] in ("0b", "0B"):
+            elif code[j : j + 2] in ("0b", "0B"):
                 j += 2
                 while j < n and code[j] in "01_":
                     j += 1
@@ -117,7 +121,7 @@ def tokenize(code):
         # symbols (greedy, longest first)
         matched_sym = False
         for sym in _SYMBOLS_SORTED:
-            if code[i:i+len(sym)] == sym:
+            if code[i : i + len(sym)] == sym:
                 tokens.append(make_token("SYMBOL", sym))
                 i += len(sym)
                 matched_sym = True
