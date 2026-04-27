@@ -21,9 +21,7 @@ tokens = tokenize(source)
 tokens_text = "\n".join(str(t) for t in tokens)
 ast = parse(tokens)
 scope_text = format_symbol_table(analyse(ast))
-
-with open("@template/output.lua", "r") as f:
-    pretty_ast = f.read()
+pretty_ast = pretty_parse(ast)
 
 readme = """\
 # luau-obfuscator
@@ -62,11 +60,21 @@ Takes that stream of tokens generated from the source code and constructs an AST
 ```
 {ast}
 ```
+
+5. Code Generation
+
+Taking the result of the AST, we're able to generate Luau output code that is obfuscated and still functional. This is done by traversing the AST and applying transformations to variable names, function names, etc., while ensuring the logic remains intact.
+
+```
+{output}
+```
+
 """.format(
     source=source.rstrip(),
     tokens=tokens_text,
     scope=scope_text.rstrip(),
     ast=pretty_ast.rstrip(),
+    output=open("@template/output.lua", "r").read().rstrip()
 )
 
 with open("README.md", "w") as f:

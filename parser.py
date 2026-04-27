@@ -413,7 +413,7 @@ def parse(tokens):
 
 
 def pretty_parse(tokens):
-    ast = parse(tokens)
+    ast = tokens if isinstance(tokens, Node) else parse(tokens)
 
     def to_data(value):
         if isinstance(value, Node):
