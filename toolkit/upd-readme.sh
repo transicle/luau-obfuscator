@@ -65,7 +65,7 @@ Takes that stream of tokens generated from the source code and constructs an AST
 
 Taking the result of the AST, we're able to generate Luau output code that is obfuscated and still functional. This is done by traversing the AST and applying transformations to variable names, function names, etc., while ensuring the logic remains intact.
 
-```
+```lua
 {output}
 ```
 

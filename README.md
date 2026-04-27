@@ -202,17 +202,7 @@ Takes that stream of tokens generated from the source code and constructs an AST
 
 Taking the result of the AST, we're able to generate Luau output code that is obfuscated and still functional. This is done by traversing the AST and applying transformations to variable names, function names, etc., while ensuring the logic remains intact.
 
-```
-local F1JIlIfFITtltfjIt1FT = game:GetService("Players")
-local jj7IfFTltlTJj1 = F1JIlIfFITtltfjIt1FT.LocalPlayer
-local TJITFTtlJj1If7FIjFIlfF = jj7IfFTltlTJj1.Character or jj7IfFTltlTJj1.CharacterAdded:Wait()
-local Tljtl17jTtFf1tt = TJITFTtlJj1If7FIjFIlfF:FindFirstChild("Humanoid")
-lTTjlj17FIfjlT771J1F7F = 64
-local function IIjTffl7l77IJ7lj1Ttt1f(lFjJjFjJlTFl1I7f1TJ)
-    local j17FjlltTI1FlJl1FfF = lFjJjFjJlTFl1I7f1TJ:FindFirstChild("Humanoid")
-    j17FjlltTI1FlJl1FfF.WalkSpeed = lTTjlj17FIfjlT771J1F7F
-end
-Tljtl17jTtFf1tt.WalkSpeed = lTTjlj17FIfjlT771J1F7F
-jj7IfFTltlTJj1.CharacterAdded:Connect(IIjTffl7l77IJ7lj1Ttt1f)
+```lua
+local IlJffjTIjFTl7It=game:GetService("Players");local JJIFj1lJTfIJfFj1J=IlJffjTIjFTl7It.LocalPlayer;local JFJllIjIT1T7IF=JJIFj1lJTfIJfFj1J.Character or JJIFj1lJTfIJfFj1J.CharacterAdded:Wait();local Jfj1jfITflFF7lTtIf=JFJllIjIT1T7IF:FindFirstChild("Humanoid");l7TIFIl7lJIlfJf=64;local function j7fl7Il77tt7f7fj1(t1f1tffj7fTT7ll) local ltI7Fft7T1lFfJlFj7t1J=t1f1tffj7fTT7ll:FindFirstChild("Humanoid");ltI7Fft7T1lFfJlFj7t1J.WalkSpeed=l7TIFIl7lJIlfJf end;Jfj1jfITflFF7lTtIf.WalkSpeed=l7TIFIl7lJIlfJf;JJIFj1lJTfIJfFj1J.CharacterAdded:Connect(j7fl7Il77tt7f7fj1)
 ```
 
