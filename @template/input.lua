@@ -1,16 +1,8 @@
-local Players = game:GetService("Players")
+local name = "transicle"
+local age = 17
 
-local localPlayer = Players.LocalPlayer
-local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
-local humanoid = character:FindFirstChild("Humanoid")
-
-desiredSpeed = 64
-local function applyWalkspeed(newCharacter)
-    local humanoid = newCharacter:FindFirstChild("Humanoid")
-
-    humanoid.WalkSpeed = desiredSpeed
+if age == 17 and name == "transicle" then
+    print("Hello, transicle! You are 17 years old.")
+else
+    print("Hello, stranger!")
 end
-
-humanoid.WalkSpeed = desiredSpeed
-
-localPlayer.CharacterAdded:Connect(applyWalkspeed)

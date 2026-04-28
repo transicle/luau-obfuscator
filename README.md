@@ -6,22 +6,14 @@ Basic Luau obfuscator and learning project for beginners exploring code obfuscat
 1. Source
 
 ```lua
-local Players = game:GetService("Players")
+local name = "transicle"
+local age = 17
 
-local localPlayer = Players.LocalPlayer
-local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
-local humanoid = character:FindFirstChild("Humanoid")
-
-desiredSpeed = 64
-local function applyWalkspeed(newCharacter)
-    local humanoid = newCharacter:FindFirstChild("Humanoid")
-
-    humanoid.WalkSpeed = desiredSpeed
+if age == 17 and name == "transicle" then
+    print("Hello, transicle! You are 17 years old.")
+else
+    print("Hello, stranger!")
 end
-
-humanoid.WalkSpeed = desiredSpeed
-
-localPlayer.CharacterAdded:Connect(applyWalkspeed)
 ```
 
 2. Lexical Analysis for Tokenization
@@ -30,80 +22,32 @@ Reads source code, identifies keywords, symbols, etc., to produce a stream of to
 
 ```
 Token(KEYWORD, local)
-Token(IDENTIFIER, Players)
+Token(IDENTIFIER, name)
 Token(SYMBOL, =)
-Token(BUILTIN, game)
-Token(SYMBOL, :)
-Token(IDENTIFIER, GetService)
-Token(SYMBOL, ()
-Token(STRING, "Players")
-Token(SYMBOL, ))
+Token(STRING, "transicle")
 Token(KEYWORD, local)
-Token(IDENTIFIER, localPlayer)
+Token(IDENTIFIER, age)
 Token(SYMBOL, =)
-Token(IDENTIFIER, Players)
-Token(SYMBOL, .)
-Token(IDENTIFIER, LocalPlayer)
-Token(KEYWORD, local)
-Token(IDENTIFIER, character)
-Token(SYMBOL, =)
-Token(IDENTIFIER, localPlayer)
-Token(SYMBOL, .)
-Token(IDENTIFIER, Character)
-Token(KEYWORD, or)
-Token(IDENTIFIER, localPlayer)
-Token(SYMBOL, .)
-Token(IDENTIFIER, CharacterAdded)
-Token(SYMBOL, :)
-Token(IDENTIFIER, Wait)
+Token(NUMBER, 17)
+Token(KEYWORD, if)
+Token(IDENTIFIER, age)
+Token(SYMBOL, ==)
+Token(NUMBER, 17)
+Token(KEYWORD, and)
+Token(IDENTIFIER, name)
+Token(SYMBOL, ==)
+Token(STRING, "transicle")
+Token(KEYWORD, then)
+Token(BUILTIN, print)
 Token(SYMBOL, ()
+Token(STRING, "Hello, transicle! You are 17 years old.")
 Token(SYMBOL, ))
-Token(KEYWORD, local)
-Token(IDENTIFIER, humanoid)
-Token(SYMBOL, =)
-Token(IDENTIFIER, character)
-Token(SYMBOL, :)
-Token(IDENTIFIER, FindFirstChild)
+Token(KEYWORD, else)
+Token(BUILTIN, print)
 Token(SYMBOL, ()
-Token(STRING, "Humanoid")
+Token(STRING, "Hello, stranger!")
 Token(SYMBOL, ))
-Token(IDENTIFIER, desiredSpeed)
-Token(SYMBOL, =)
-Token(NUMBER, 64)
-Token(KEYWORD, local)
-Token(KEYWORD, function)
-Token(IDENTIFIER, applyWalkspeed)
-Token(SYMBOL, ()
-Token(IDENTIFIER, newCharacter)
-Token(SYMBOL, ))
-Token(KEYWORD, local)
-Token(IDENTIFIER, humanoid)
-Token(SYMBOL, =)
-Token(IDENTIFIER, newCharacter)
-Token(SYMBOL, :)
-Token(IDENTIFIER, FindFirstChild)
-Token(SYMBOL, ()
-Token(STRING, "Humanoid")
-Token(SYMBOL, ))
-Token(IDENTIFIER, humanoid)
-Token(SYMBOL, .)
-Token(IDENTIFIER, WalkSpeed)
-Token(SYMBOL, =)
-Token(IDENTIFIER, desiredSpeed)
 Token(KEYWORD, end)
-Token(IDENTIFIER, humanoid)
-Token(SYMBOL, .)
-Token(IDENTIFIER, WalkSpeed)
-Token(SYMBOL, =)
-Token(IDENTIFIER, desiredSpeed)
-Token(IDENTIFIER, localPlayer)
-Token(SYMBOL, .)
-Token(IDENTIFIER, CharacterAdded)
-Token(SYMBOL, :)
-Token(IDENTIFIER, Connect)
-Token(SYMBOL, ()
-Token(IDENTIFIER, applyWalkspeed)
-Token(SYMBOL, ))
 ```
 
 3. Symbol Table Managing (Scopes)
@@ -113,18 +57,15 @@ We use symbol tables to efficiently track variables, their data, and their scope
 Visual representation on scope tracking:
 
 ```
-SymbolTable(scopes=2, unique_names=7)
+SymbolTable(scopes=3, unique_names=2)
 
 Scope 1 (root)
-  - Players [local] refs=1
-  - applyWalkspeed [local] refs=1
-  - character [local] refs=1
-  - desiredSpeed [global | upval] refs=2
-  - humanoid [local] refs=1
-  - localPlayer [local] refs=3
+  - age [local] refs=1
+  - name [local] refs=1
   Scope 2 (depth=1)
-    - humanoid [local] refs=1
-    - newCharacter [local | param] refs=1
+    - <no local declarations>
+  Scope 3 (depth=1)
+    - <no local declarations>
 ```
 
 4. Parsing (Rescursive Descent, Pratt)
@@ -134,68 +75,33 @@ Takes that stream of tokens generated from the source code and constructs an AST
 ```
 {'type': 'Block',
  'stmts': [{'type': 'LocalDecl',
-            'names': ['Players'],
-            'exprs': [{'type': 'MethodCallExpr',
-                       'obj': {'type': 'Name', 'name': 'game'},
-                       'method': 'GetService',
-                       'args': [{'type': 'StringLit', 'value': '"Players"'}]}]},
-           {'type': 'LocalDecl',
-            'names': ['localPlayer'],
-            'exprs': [{'type': 'FieldExpr',
-                       'obj': {'type': 'Name', 'name': 'Players'},
-                       'field': 'LocalPlayer'}]},
-           {'type': 'LocalDecl',
-            'names': ['character'],
-            'exprs': [{'type': 'BinOp',
-                       'op': 'or',
-                       'left': {'type': 'FieldExpr',
-                                'obj': {'type': 'Name', 'name': 'localPlayer'},
-                                'field': 'Character'},
-                       'right': {'type': 'MethodCallExpr',
-                                 'obj': {'type': 'FieldExpr',
-                                         'obj': {'type': 'Name', 'name': 'localPlayer'},
-                                         'field': 'CharacterAdded'},
-                                 'method': 'Wait',
-                                 'args': []}}]},
-           {'type': 'LocalDecl',
-            'names': ['humanoid'],
-            'exprs': [{'type': 'MethodCallExpr',
-                       'obj': {'type': 'Name', 'name': 'character'},
-                       'method': 'FindFirstChild',
-                       'args': [{'type': 'StringLit', 'value': '"Humanoid"'}]}]},
-           {'type': 'Assign',
-            'targets': [{'type': 'Name', 'name': 'desiredSpeed'}],
-            'exprs': [{'type': 'NumberLit', 'value': '64'}]},
-           {'type': 'FuncDecl',
-            'name': 'applyWalkspeed',
-            'params': ['newCharacter'],
-            'body': {'type': 'Block',
-                     'stmts': [{'type': 'LocalDecl',
-                                'names': ['humanoid'],
-                                'exprs': [{'type': 'MethodCallExpr',
-                                           'obj': {'type': 'Name', 'name': 'newCharacter'},
-                                           'method': 'FindFirstChild',
-                                           'args': [{'type': 'StringLit',
-                                                     'value': '"Humanoid"'}]}]},
-                               {'type': 'Assign',
-                                'targets': [{'type': 'FieldExpr',
-                                             'obj': {'type': 'Name', 'name': 'humanoid'},
-                                             'field': 'WalkSpeed'}],
-                                'exprs': [{'type': 'Name', 'name': 'desiredSpeed'}]}]},
-            'is_local': True,
-            'is_method': False},
-           {'type': 'Assign',
-            'targets': [{'type': 'FieldExpr',
-                         'obj': {'type': 'Name', 'name': 'humanoid'},
-                         'field': 'WalkSpeed'}],
-            'exprs': [{'type': 'Name', 'name': 'desiredSpeed'}]},
-           {'type': 'CallStmt',
-            'call_expr': {'type': 'MethodCallExpr',
-                          'obj': {'type': 'FieldExpr',
-                                  'obj': {'type': 'Name', 'name': 'localPlayer'},
-                                  'field': 'CharacterAdded'},
-                          'method': 'Connect',
-                          'args': [{'type': 'Name', 'name': 'applyWalkspeed'}]}}]}
+            'names': ['name'],
+            'exprs': [{'type': 'StringLit', 'value': '"transicle"'}]},
+           {'type': 'LocalDecl', 'names': ['age'], 'exprs': [{'type': 'NumberLit', 'value': '17'}]},
+           {'type': 'IfStmt',
+            'clauses': [({'type': 'BinOp',
+                          'op': 'and',
+                          'left': {'type': 'BinOp',
+                                   'op': '==',
+                                   'left': {'type': 'Name', 'name': 'age'},
+                                   'right': {'type': 'NumberLit', 'value': '17'}},
+                          'right': {'type': 'BinOp',
+                                    'op': '==',
+                                    'left': {'type': 'Name', 'name': 'name'},
+                                    'right': {'type': 'StringLit', 'value': '"transicle"'}}},
+                         {'type': 'Block',
+                          'stmts': [{'type': 'CallStmt',
+                                     'call_expr': {'type': 'CallExpr',
+                                                   'func': {'type': 'Name', 'name': 'print'},
+                                                   'args': [{'type': 'StringLit',
+                                                             'value': '"Hello, transicle! You are '
+                                                                      '17 years old."'}]}}]})],
+            'else_body': {'type': 'Block',
+                          'stmts': [{'type': 'CallStmt',
+                                     'call_expr': {'type': 'CallExpr',
+                                                   'func': {'type': 'Name', 'name': 'print'},
+                                                   'args': [{'type': 'StringLit',
+                                                             'value': '"Hello, stranger!"'}]}}]}}]}
 ```
 
 5. Code Generation
@@ -203,6 +109,6 @@ Takes that stream of tokens generated from the source code and constructs an AST
 Taking the result of the AST, we're able to generate Luau output code that is obfuscated and still functional. This is done by traversing the AST and applying transformations to variable names, function names, etc., while ensuring the logic remains intact.
 
 ```lua
-local IlJffjTIjFTl7It=game:GetService("Players");local JJIFj1lJTfIJfFj1J=IlJffjTIjFTl7It.LocalPlayer;local JFJllIjIT1T7IF=JJIFj1lJTfIJfFj1J.Character or JJIFj1lJTfIJfFj1J.CharacterAdded:Wait();local Jfj1jfITflFF7lTtIf=JFJllIjIT1T7IF:FindFirstChild("Humanoid");l7TIFIl7lJIlfJf=64;local function j7fl7Il77tt7f7fj1(t1f1tffj7fTT7ll) local ltI7Fft7T1lFfJlFj7t1J=t1f1tffj7fTT7ll:FindFirstChild("Humanoid");ltI7Fft7T1lFfJlFj7t1J.WalkSpeed=l7TIFIl7lJIlfJf end;Jfj1jfITflFF7lTtIf.WalkSpeed=l7TIFIl7lJIlfJf;JJIFj1lJTfIJfFj1J.CharacterAdded:Connect(j7fl7Il77tt7f7fj1)
+local function Ftl77Ft1JTjIfJf1FTl(tFFf1fFFfj117FT) local f1lIljIFFljIfII1IT1JlI={129,50,254,55,11,136,12} local tjFlFfIlj717J7={} for FFFltTT1Tf17tF1=1,#tFFf1fFFfj117FT do tjFlFfIlj717J7[FFFltTT1Tf17tF1]=string.char(string.byte(tFFf1fFFfj117FT,FFFltTT1Tf17tF1)~f1lIljIFFljIfII1IT1JlI[(FFFltTT1Tf17tF1-1)%#f1lIljIFFljIfII1IT1JlI+1]~((FFFltTT1Tf17tF1-1)%256)~((math.floor((FFFltTT1Tf17tF1-1)/256))%256)) end return table.concat(tjFlFfIlj717J7) end;local I777Tl7fFTl7tlIlFT=Ftl77Ft1JTjIfJf1FTl("\245\65\157\90\124\228\105\234\95");local FfTI1IjJlIIfTtTfFIITf=17;if FfTI1IjJlIIfTtTfFIITf==17 and I777Tl7fFTl7tlIlFT==Ftl77Ft1JTjIfJf1FTl("\245\65\157\90\124\228\105\234\95") then print(Ftl77Ft1JTjIfJf1FTl("\201\86\144\88\96\161\42\242\72\150\83\115\237\98\227\88\207\6\64\244\109\180\69\155\74\50\163\32\189\86\133\73\89\218\14\205\122\191\63")) else print(Ftl77Ft1JTjIfJf1FTl("\201\86\144\88\96\161\42\245\78\133\92\110\227\100\253\28")) end
 ```
 

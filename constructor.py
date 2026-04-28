@@ -164,6 +164,9 @@ class Constructor:
         if isinstance(node, CallStmt):
             return f"{ind}{self._expr(node.call_expr)}"
 
+        if isinstance(node, RawStmt):
+            return f"{ind}{node.code}"
+
         raise NotImplementedError(f"_stmt: unhandled {type(node).__name__}")
 
     def _if_stmt(self, node):

@@ -5,18 +5,15 @@ from scope import analyse
 from tokens import *
 
 
-# i think its a good idea to rename variables in a way to use
-# specific characters, kinda like the IIIlllIllI method but
-# just full of ugly characters
 def rename_vars(ast):
-    chars = "IlJjfFtT"
-    rest = "Il1JjfFtT7"
     forbidden = (
         set(BUILTINS) | set(KEYWORDS) | set(TYPES) | set(TYPE_KEYWORDS) | set(VAR_DECLS)
     )
-    used = set(forbidden)
-    rand = random.SystemRandom()
-    table = analyse(ast)
+    chars = "IlJjfFtT"
+    rest  = "Il1JjfFtT7"
+    used  = set(forbidden)
+    rand  = random.SystemRandom()
+    scope_table = analyse(ast)
     renamed = {}
 
     def fresh():
@@ -28,7 +25,7 @@ def rename_vars(ast):
                 used.add(name)
                 return name
 
-    for symbols in table.symbol_of.values():
+    for symbols in scope_table.symbol_of.values():
         for symbol in symbols:
             if symbol.decl_node is not None:
                 renamed[id(symbol)] = fresh()
@@ -42,34 +39,35 @@ def rename_vars(ast):
     def walk(node):
         if node is None or not isinstance(node, Node):
             return
-        scope = table.scope_of.get(id(node))
+        scope = scope_table.scope_of.get(id(node))
         if isinstance(node, Name):
             node.name = rename(scope, node.name)
         elif isinstance(node, LocalDecl):
-            node.names = [rename(scope, name, True) for name in node.names]
+            node.names = [rename(scope, n, True) for n in node.names]
         elif isinstance(node, Assign):
             for target in node.targets:
                 if isinstance(target, Name):
                     target.name = rename(scope, target.name)
         elif isinstance(node, FuncDecl):
-            body_scope = table.scope_of.get(id(node.body))
+            body_scope = scope_table.scope_of.get(id(node.body))
             if "." not in node.name and ":" not in node.name:
                 node.name = rename(scope, node.name, True)
             node.params = [
-                rename(body_scope, name, True) if name != "..." else name
-                for name in node.params
+                rename(body_scope, p, True) if p != "..." else p
+                for p in node.params
             ]
         elif isinstance(node, FuncExpr):
-            body_scope = table.scope_of.get(id(node.body))
+            body_scope = scope_table.scope_of.get(id(node.body))
             node.params = [
-                rename(body_scope, name, True) if name != "..." else name
-                for name in node.params
+                rename(body_scope, p, True) if p != "..." else p
+                for p in node.params
             ]
         elif isinstance(node, NumericFor):
-            node.var = rename(table.scope_of.get(id(node.body)), node.var, True)
+            node.var = rename(scope_table.scope_of.get(id(node.body)), node.var, True)
         elif isinstance(node, GenericFor):
-            body_scope = table.scope_of.get(id(node.body))
-            node.names = [rename(body_scope, name, True) for name in node.names]
+            body_scope = scope_table.scope_of.get(id(node.body))
+            node.names = [rename(body_scope, n, True) for n in node.names]
+
         for value in node.__dict__.values():
             if isinstance(value, Node):
                 walk(value)

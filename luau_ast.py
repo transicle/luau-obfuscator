@@ -99,6 +99,11 @@ class StringLit(Node):
         self.value = value
 
 
+class RawStmt(Node):
+    def __init__(self, code):
+        self.code = code
+
+
 class BoolLit(Node):
     def __init__(self, value):
         self.value = value
