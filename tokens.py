@@ -39,7 +39,6 @@ BUILTINS   = [
     "game", "workspace", "script", "plugin",
     "tick", "time", "os.clock",
     "task", "spawn", "delay", "wait",
-    "getgenv", "getsenv", "getrenv",
     "shared",
 ]
 TYPE_KEYWORDS = [

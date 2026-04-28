@@ -1,8 +1,3 @@
-local name = "transicle"
-local age = 17
+local I,L,Y = "I", "love", "you!"
 
-if age == 17 and name == "transicle" then
-    print("Hello, transicle! You are 17 years old.")
-else
-    print("Hello, stranger!")
-end
+print(I, L, Y:gsub("!", ""), "so", "much!")

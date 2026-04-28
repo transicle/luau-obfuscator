@@ -130,11 +130,11 @@ def _entropy_prelude(rand, used):
     prelude = (
         f"local {seed_name}=0;"
         f"local {ok_time},{val_time}=pcall(function() return (os and os.time and os.time()) or 0 end);"
-        f"if {ok_time} and type({val_time})=='number' then {seed_name}=({seed_name}+{val_time})%2147483647 end;"
+        f"if {ok_time} and tonumber({val_time})~=nil then {seed_name}=({seed_name}+{val_time})%2147483647 end;"
         f"local {ok_clock},{val_clock}=pcall(function() return (os and os.clock and os.clock()) or 0 end);"
-        f"if {ok_clock} and type({val_clock})=='number' then {seed_name}=({seed_name}+math.floor({val_clock}*1000000))%2147483647 end;"
+        f"if {ok_clock} and tonumber({val_clock})~=nil then {seed_name}=({seed_name}+math.floor({val_clock}*1000000))%2147483647 end;"
         f"local {ok_dt},{val_dt}=pcall(function() return DateTime.now().UnixTimestampMillis end);"
-        f"if {ok_dt} and type({val_dt})=='number' then {seed_name}=({seed_name}+{val_dt})%2147483647 end;"
+        f"if {ok_dt} and tonumber({val_dt})~=nil then {seed_name}=({seed_name}+{val_dt})%2147483647 end;"
         f"for {round_idx}=1,{rand.randint(2,5)} do {seed_name}=(({seed_name}*1103515245)+12345)%2147483647 end;"
     )
     return seed_name, prelude

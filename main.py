@@ -1,6 +1,7 @@
 from lexer     import tokenize
 from rename    import rename_vars
 from encrypt   import encrypt_strings
+from builtin_table import obfuscate_builtins
 from dead_code import inject_dead_code
 from parser    import parse
 from constructor import Constructor
@@ -10,6 +11,7 @@ def minify(code):
     ast = parse(tokens)
     ast = encrypt_strings(ast)
     ast = rename_vars(ast)
+    ast = obfuscate_builtins(ast)
     obfuscated_ast = inject_dead_code(ast)
     return Constructor(minify=True).generate(obfuscated_ast)
 
