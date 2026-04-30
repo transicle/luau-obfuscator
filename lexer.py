@@ -1,6 +1,5 @@
 from tokens import *
 
-# longest symbols first because greedy matching
 _SYMBOLS_SORTED = sorted(SYMBOLS, key=len, reverse=True)
 
 
@@ -9,7 +8,6 @@ def tokenize(code):
     i = 0
     n = len(code)
 
-    # greedy hungry little boy
     while i < n:
         if code[i].isspace():
             i += 1
@@ -31,9 +29,9 @@ def tokenize(code):
             j = i + 1
             while j < n and code[j] != '"':
                 if code[j] == "\\":
-                    j += 1  # skip escaped char
+                    j += 1
                 j += 1
-            j += 1  # closing quote
+            j += 1
             tokens.append(make_token("STRING", code[i:j]))
             i = j
             continue
@@ -79,12 +77,10 @@ def tokenize(code):
             code[i] == "." and i + 1 < n and code[i + 1].isdigit()
         ):
             j = i
-            # hex  0x...
             if code[j : j + 2] in ("0x", "0X"):
                 j += 2
                 while j < n and (code[j] in "0123456789abcdefABCDEF_"):
                     j += 1
-            # binary  0b...
             elif code[j : j + 2] in ("0b", "0B"):
                 j += 2
                 while j < n and code[j] in "01_":
@@ -118,7 +114,6 @@ def tokenize(code):
             i = j
             continue
 
-        # symbols (greedy, longest first)
         matched_sym = False
         for sym in _SYMBOLS_SORTED:
             if code[i : i + len(sym)] == sym:
@@ -129,7 +124,6 @@ def tokenize(code):
         if matched_sym:
             continue
 
-        # identifier / keyword / type / builtin
         if code[i].isalpha() or code[i] == "_":
             j = i
             while j < n and (code[j].isalnum() or code[j] == "_"):
@@ -148,7 +142,6 @@ def tokenize(code):
             i = j
             continue
 
-        # unknown character
         tokens.append(make_token("UNKNOWN", code[i]))
         i += 1
 

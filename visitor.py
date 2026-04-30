@@ -135,8 +135,6 @@ class Visitor:
                     self.visit(key)
                 self.visit(value)
 
-        # Leaf nodes: Name, NumberLit, StringLit, BoolLit,
-        #             NilLit, VarArgExpr, BreakStmt, ContinueStmt — no children
 
 
 class Transformer:

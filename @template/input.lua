@@ -1,3 +1,3 @@
-local I,L,Y = "I", "love", "you!"
+local age, name = 17, "lily"
 
-print(I, L, Y:gsub("!", ""), "so", "much!")
+print(age, name)

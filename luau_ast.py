@@ -43,7 +43,6 @@ class IfStmt(Node):
         self.clauses = clauses
         self.else_body = else_body
 
-    # clauses = [(cond, body), ...]
 
 
 class NumericFor(Node):
@@ -164,7 +163,6 @@ class TableConstructor(Node):
     def __init__(self, fields):
         self.fields = fields
 
-    # fields = [(key_expr | None, value_expr), ...]
 
 
 class FuncExpr(Node):

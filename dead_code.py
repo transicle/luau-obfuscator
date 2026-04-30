@@ -84,9 +84,11 @@ def _rand_expr(rand, depth=0):
         return str(rand.randint(0, 2048))
     left = _rand_expr(rand, depth + 1)
     right = _rand_expr(rand, depth + 1)
-    op = rand.choice(["+", "-", "*", "~", "%"])
+    op = rand.choice(["+", "-", "*", "xor", "%"])
     if op == "%":
         right = str(rand.randint(3, 251))
+    if op == "xor":
+        return f"bit32.bxor({left},{right})"
     return f"(({left}){op}({right}))"
 
 
@@ -161,14 +163,14 @@ def _dead_block_alpha(rand, used):
         f"local function {n['func_name']}({n['arg_a']},{n['arg_b']})"
         f" local {n['tmp_name']}=(({n['arg_a']}*3)+({n['arg_b']}*11))%257;"
         f" if {n['tmp_name']}==-1 then return ({_lua_quote('X')}..{_lua_quote('Y')}) end;"
-        f" return ({n['tmp_name']}~{n['tmp_name']})+({n['nonce_name']}%1)+(({seed_name}%3)-({seed_name}%3))"
+        f" return bit32.bxor({n['tmp_name']},{n['tmp_name']})+({n['nonce_name']}%1)+(({seed_name}%3)-({seed_name}%3))"
         f" end;"
         f"if (({n['nonce_name']}%2)==1 and ({n['nonce_name']}%2)==0) or (#tostring({n['table_name']}.{n['sig_key_name']})<0) then "
         f"{n['func_name']}({rand.randint(1,9)},{rand.randint(1,9)}) end;"
         f"do local {n['tmp_name']}={{}};"
-        f"for {n['idx_name']}=1,3 do {n['tmp_name']}[{n['idx_name']}]=(({n['idx_name']}*11)~{n['idx_name']})%256 end;"
+        f"for {n['idx_name']}=1,3 do {n['tmp_name']}[{n['idx_name']}]=bit32.bxor({n['idx_name']}*11,{n['idx_name']})%256 end;"
         f"if {n['tmp_name']}[1]=={fake_cmp} then {n['table_name']}.{n['ttl_key_name']}={n['tmp_name']}[1] end;"
-        f"local {slot_name}=({n['table_name']}.{n['ttl_key_name']}~{n['table_name']}.{n['ttl_key_name']})+(({seed_name}%17)-({seed_name}%17));"
+        f"local {slot_name}=bit32.bxor({n['table_name']}.{n['ttl_key_name']},{n['table_name']}.{n['ttl_key_name']})+(({seed_name}%17)-({seed_name}%17));"
         f"if ({seed_name}%19)==23 then {n['table_name']}.{n['ttl_key_name']}={slot_name} end"
         f" end"
     )
@@ -191,13 +193,13 @@ def _dead_block_beta(rand, used):
         f"local {token_name}={marker};"
         f"local {n['nonce_name']}=((({_rand_expr(rand)})+{seed_name})%8192);"
         f"local {arr_name}={{}};"
-        f"for {n['idx_name']}=1,{loops} do {arr_name}[{n['idx_name']}]=(({n['idx_name']}*{rand.randint(7,29)})~{n['nonce_name']})%255 end;"
+        f"for {n['idx_name']}=1,{loops} do {arr_name}[{n['idx_name']}]=bit32.bxor({n['idx_name']}*{rand.randint(7,29)},{n['nonce_name']})%255 end;"
         f"local {n['table_name']}={{{n['nonce_key_name']}={n['nonce_name']},{n['sig_key_name']}={token_name},{n['ttl_key_name']}={tt_expr}}};"
         f"local function {n['func_name']}({n['arg_a']},{n['arg_b']})"
-        f" local {xor_name}=(({n['arg_a']}~{n['arg_b']})~({n['arg_b']}~{n['arg_a']}));"
+        f" local {xor_name}=bit32.bxor(bit32.bxor({n['arg_a']},{n['arg_b']}),bit32.bxor({n['arg_b']},{n['arg_a']}));"
         f" local {gate_name}=({xor_name}%2)==2;"
         f" if {gate_name} then return {n['table_name']}.{n['sig_key_name']} end;"
-        f" return ({n['table_name']}.{n['ttl_key_name']}~{n['table_name']}.{n['ttl_key_name']})+(({seed_name}%5)-({seed_name}%5))"
+        f" return bit32.bxor({n['table_name']}.{n['ttl_key_name']},{n['table_name']}.{n['ttl_key_name']})+(({seed_name}%5)-({seed_name}%5))"
         f" end;"
         f"if (#tostring({n['table_name']}.{n['sig_key_name']})<0) or (({n['nonce_name']}%5)==8) or (({seed_name}%11)==12) then {n['func_name']}({_rand_expr(rand)},{_rand_expr(rand)}) end"
     )
@@ -224,7 +226,7 @@ def _dead_block_gamma(rand, used):
         f"local function {n['func_name']}({n['arg_a']},{n['arg_b']})"
         f" local {n['tmp_name']}=((({n['arg_a']}+{n['arg_b']})*13)%511);"
         f" if ({n['tmp_name']}<0) and ({n['tmp_name']}>0) then return {n['table_name']}.{n['sig_key_name']} end;"
-        f" return ({n['table_name']}.{n['nonce_key_name']}%1)+({n['table_name']}.{n['ttl_key_name']}~{n['table_name']}.{n['ttl_key_name']})+(({seed_name}%7)-({seed_name}%7))"
+        f" return ({n['table_name']}.{n['nonce_key_name']}%1)+bit32.bxor({n['table_name']}.{n['ttl_key_name']},{n['table_name']}.{n['ttl_key_name']})+(({seed_name}%7)-({seed_name}%7))"
         f" end;"
         f"do local {n['marker_name']}={n['func_name']}({_rand_expr(rand)},{_rand_expr(rand)});"
         f"if #tostring({n['marker_name']})==-1 or (({seed_name}%23)==24) then {n['table_name']}.{n['ttl_key_name']}=0 end end"

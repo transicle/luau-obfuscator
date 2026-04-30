@@ -57,6 +57,6 @@ class Token:
 
     def __repr__(self):
         return f"Token({self.type}, {self.value})"
-    
+
 def make_token(type, value):
     return Token(type, value)

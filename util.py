@@ -1,8 +1,6 @@
 import random
 
 
-# specific set of characters that are bad on the eyes
-# to make it harder to read
 _CHARS = "IlJjfFtT"
 _REST  = "Il1JjfFtT7"
 

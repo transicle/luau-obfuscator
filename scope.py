@@ -7,9 +7,9 @@ class Symbol:
         self.name       = name
         self.is_local   = is_local
         self.is_param   = is_param
-        self.is_upval   = False      # set True when referenced by child scope
+        self.is_upval   = False
         self.decl_node  = decl_node
-        self.refs       = []         # Name nodes that read this symbol
+        self.refs       = []
 
     def __repr__(self):
         flags = []
@@ -27,9 +27,9 @@ class Scope:
         Scope._id_counter += 1
         self.id       = Scope._id_counter
         self.parent   = parent
-        self.node     = node      # the AST node that opened this scope (FuncDecl, etc.)
+        self.node     = node
         self.children = []
-        self.symbols  = {}        # name → Symbol (locals are declared here)
+        self.symbols  = {}
 
         if parent is not None:
             parent.children.append(self)
@@ -67,8 +67,8 @@ class Scope:
 class SymbolTable:
     def __init__(self, root):
         self.root      = root
-        self.scope_of  = {}   # Node → Scope (which scope a node belongs to)
-        self.symbol_of = {}   # name → [Symbol, ...]  (all decls across all scopes)
+        self.scope_of  = {}
+        self.symbol_of = {}
 
     def _register(self, sym):
         self.symbol_of.setdefault(sym.name, []).append(sym)
@@ -97,8 +97,8 @@ class ScopeAnalyser(Visitor):
         Scope._id_counter = 0
         root          = Scope(parent=None, node=None)
         self.table    = SymbolTable(root)
-        self._scope   = root          # current scope during traversal
-        self._pending_refs = []       # (Name node, scope_at_read) — resolved post-walk
+        self._scope   = root
+        self._pending_refs = []
 
     def _push(self, node):
         s = Scope(parent=self._scope, node=node)
@@ -117,7 +117,6 @@ class ScopeAnalyser(Visitor):
     def visit(self, node):
         if node is None:
             return
-        # Record which scope this node lives in
         self.table.scope_of[id(node)] = self._scope
 
         dispatch = getattr(self, f"visit_{type(node).__name__}", None)
@@ -140,7 +139,6 @@ class ScopeAnalyser(Visitor):
             self.visit(expr)
         for target in node.targets:
             if isinstance(target, Name):
-                # global assignment if name not already in scope
                 if self._scope.lookup(target.name) is None:
                     self._declare(target.name, is_local=False, decl_node=node)
             else:
@@ -158,7 +156,6 @@ class ScopeAnalyser(Visitor):
         self._pop()
 
     def visit_RepeatLoop(self, node):
-        # repeat…until: condition can see locals declared in the body
         self._push(node)
         self.visit(node.body)
         self.visit(node.cond)
@@ -181,7 +178,6 @@ class ScopeAnalyser(Visitor):
         if node.step:
             self.visit(node.step)
         self._push(node)
-        # loop variable is local to the for-body scope
         self._declare(node.var, is_local=True, is_param=True, decl_node=node)
         self.visit(node.body)
         self._pop()
@@ -197,7 +193,6 @@ class ScopeAnalyser(Visitor):
 
     def _visit_func(self, func_node, name, params, body, is_local):
         if is_local and name:
-            # `local function f`, f is visible inside its own body (recursive)
             self._declare(name, is_local=True, decl_node=func_node)
         self._push(func_node)
         for p in params:
@@ -206,7 +201,6 @@ class ScopeAnalyser(Visitor):
         self.visit(body)
         self._pop()
         if not is_local and name:
-            # `function f` at statement level, f is global (or already declared)
             if self._scope.lookup(name) is None:
                 self._declare(name, is_local=False, decl_node=func_node)
 
